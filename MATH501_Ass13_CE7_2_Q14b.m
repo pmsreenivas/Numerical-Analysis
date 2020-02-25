@@ -1,0 +1,36 @@
+f = @(t,x) exp(t) - 1;
+g = @(t) exp(t) - 1 - t;
+xt = 0;
+Axt = 0;
+h = 2^-7;
+w1 = (263 + 24*sqrt(5))/1812;
+w2 = (125*(1 - 8*sqrt(5)))/3828;
+w3 = (1024*(3346 + 1623*sqrt(5)))/5924787;
+w4 = (2*(15 - 2*sqrt(5)))/123;
+c31 = (3*(-963 + 476*sqrt(5)))/1024;
+c32 = (5*(757 + 324*sqrt(5)))/1024;
+c41 = (-3365 + 2094*sqrt(5))/6040;
+c42 = (-975 - 3046*sqrt(5))/2552;
+c43 = (32*(14595 + 6374*sqrt(5)))/240845;
+for pt = h:h:1
+    k1 = h*feval(f,pt,xt);
+    k2 = h*feval(f,(pt + 0.5*h),(xt + 0.5*k1));
+    k3 = h*feval(f,(pt + 0.5*h),(xt + 0.5*k2));
+    k4 = h*feval(f,(pt + h),(xt + k3));
+    xt = xt + (k1 + 2*k2 + 2*k3 + k4)/6;
+    Ak1 = h*feval(f,pt,Axt);
+    Ak2 = h*feval(f,(pt + (2/5)*h),(Axt + (2/5)*k1));
+    Ak3 = h*feval(f,(pt + (1/16)*(14 - 3*sqrt(5))*h),(Axt + c31*Ak1 + c32*Ak2));
+    Ak4 = h*feval(f,(pt + h),(Axt + c41*Ak1 + c42*Ak2 + c43*Ak3));
+    Axt = Axt + w1*Ak1 + w2*Ak2 + w3*Ak3 + w4*Ak4;
+    av = feval(g,pt);
+    disp("The  numerically calculated value at " + num2str(pt) + " by the classical method is " + num2str(xt));
+    disp("The  numerically calculated value at " + num2str(pt) + " by the alternate method is " + num2str(Axt));
+    disp("The actual value at " + num2str(pt) + " is " + num2str(av));
+    EC = abs(av - xt);
+    EA = abs(av - Axt);
+    R = EC/EA;
+    disp("The error of the classical method at " + num2str(pt) + " is " + num2str(EC));
+    disp("The error of the alternate method at " + num2str(pt) + " is " + num2str(EA));
+    disp("The ratio of the errors at " + num2str(pt) + " is " + num2str(R));
+end
